@@ -1,15 +1,19 @@
 import os.path
 
+from aws_cdk.aws_s3_assets import Asset as S3asset
+
 from aws_cdk import (
     # Duration,
     Stack,
     aws_ec2 as ec2,
-    aws_iam as iam,
-    aws_s3_assets as S3asset
+    aws_iam as iam
     # aws_sqs as sqs,
 )
+
 from constructs import Construct
 
+dirname = os.path.dirname(__file__)
+        
 class CdkLabWebServerStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
@@ -37,7 +41,6 @@ class CdkLabWebServerStack(Stack):
 
 
         # Script in S3 as Asset
-        dirname = os.path.dirname(__file__)
         webinitscriptasset = S3asset(self, "Asset", path=os.path.join(dirname, "configure.sh"))
         asset_path = cdk_lab_web_instance.user_data.add_s3_download_command(
             bucket=webinitscriptasset.bucket,
