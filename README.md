@@ -1,7 +1,13 @@
 
 # Welcome to your CDK Python project!
 
-This is a blank project for CDK development with Python.
+This is a project for CDK development with Python.
+
+This project creates
+- A VPC and a public subnet in a network stack
+- A EC2 instance for web server
+- An S3 bucket for UserData
+- configure.sh is a script for UserData. It will install a LAMP server.
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
