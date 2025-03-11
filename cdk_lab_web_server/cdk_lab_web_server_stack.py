@@ -27,24 +27,49 @@ class CdkLabWebServerStack(Stack):
         InstanceRole.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("AmazonSSMManagedInstanceCore"))
         
         # Create an EC2 instance
-        cdk_lab_web_instance = ec2.Instance(self, "cdk_lab_web_instance", vpc=cdk_lab_vpc,
+        cdk_lab_web_instance1 = ec2.Instance(self, "cdk_lab_web_instance1", vpc=cdk_lab_vpc,
                                             instance_type=ec2.InstanceType("t2.micro"),
                                             machine_image=ec2.AmazonLinuxImage(generation=ec2.AmazonLinuxGeneration.AMAZON_LINUX_2),
                                             role=InstanceRole)
 
+        # Create an EC2 instance
+        cdk_lab_web_instance2 = ec2.Instance(self, "cdk_lab_web_instance2", vpc=cdk_lab_vpc,
+                                            instance_type=ec2.InstanceType("t2.micro"),
+                                            machine_image=ec2.AmazonLinuxImage(generation=ec2.AmazonLinuxGeneration.AMAZON_LINUX_2),
+                                            role=InstanceRole)
 
-        # Script in S3 as Asset
-        webinitscriptasset = S3asset(self, "Asset", path=os.path.join(dirname, "configure.sh"))
-        asset_path = cdk_lab_web_instance.user_data.add_s3_download_command(
-            bucket=webinitscriptasset.bucket,
-            bucket_key=webinitscriptasset.s3_object_key
+        
+
+        # Script in S3 as Asset1
+        webinitscriptasset1 = S3asset(self, "Asset1", path=os.path.join(dirname, "configure.sh"))
+        asset_path1 = cdk_lab_web_instance1.user_data.add_s3_download_command(
+            bucket=webinitscriptasset1.bucket,
+            bucket_key=webinitscriptasset1.s3_object_key
         )
 
         # Userdata executes script from S3
-        cdk_lab_web_instance.user_data.add_execute_file_command(
-            file_path=asset_path
+        cdk_lab_web_instance1.user_data.add_execute_file_command(
+            file_path=asset_path1
             )
-        webinitscriptasset.grant_read(cdk_lab_web_instance.role)
+        webinitscriptasset1.grant_read(cdk_lab_web_instance1.role)
         
+
+        # Script in S3 as Asset2
+        webinitscriptasset2 = S3asset(self, "Asset2", path=os.path.join(dirname, "configure.sh"))
+        asset_path2 = cdk_lab_web_instance2.user_data.add_s3_download_command(
+            bucket=webinitscriptasset2.bucket,
+            bucket_key=webinitscriptasset2.s3_object_key
+        )
+
+        # Userdata executes script from S3
+        cdk_lab_web_instance2.user_data.add_execute_file_command(
+            file_path=asset_path2
+            )
+        webinitscriptasset2.grant_read(cdk_lab_web_instance2.role)
+
+
         # Allow inbound HTTP traffic in security groups
-        cdk_lab_web_instance.connections.allow_from_any_ipv4(ec2.Port.tcp(80))
+        cdk_lab_web_instance1.connections.allow_from_any_ipv4(ec2.Port.tcp(80))
+
+        # Allow inbound HTTP traffic in security groups
+        cdk_lab_web_instance2.connections.allow_from_any_ipv4(ec2.Port.tcp(80))        
